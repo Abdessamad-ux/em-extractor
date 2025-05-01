@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Email Extractor for Gmail/Yahoo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+
+    h2 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      color: #444;
+      margin-top: 20px;
+    }
+
+    #inputText {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      resize: vertical;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .button-container {
+      margin: 15px 0;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    button:active {
+      background-color: #004085;
+    }
+
+    #output {
+      background-color: white;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      min-height: 100px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    #emailCount {
+      color: #007bff;
+      font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+
+      button {
+        flex: 1 1 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2>Email Extractor for Gmail and Yahoo</h2>
+
+  <textarea id="inputText" rows="10" placeholder="Paste your Google search text here..."></textarea>
+  
+  <div class="button-container">
+    <button onclick="extractEmails()">Extract Emails</button>
+    <button onclick="copyEmails()">Copy to Clipboard</button>
+    <button onclick="downloadCSV()">Download as CSV</button>
+  </div>
+
+  <h3>Filtered Emails (<span id="emailCount">0</span>):</h3>
+  <pre id="output"></pre>
+
+  <script>
+    let extractedEmails = [];
+
+    function extractEmails() {
+      const text = document.getElementById("inputText").value;
+      const regex = /[a-zA-Z0-9._%+-]+@(gmail|yahoo)\.com/gi;
+      const matches = text.match(regex) || [];
+      extractedEmails = [...new Set(matches)]; // Remove duplicates
+
+      document.getElementById("output").textContent = extractedEmails.join('\n');
+      document.getElementById("emailCount").textContent = extractedEmails.length;
+    }
+
+    function copyEmails() {
+      if (extractedEmails.length === 0) {
+        alert("No emails to copy. Extract emails first!");
+        return;
+      }
+
+      navigator.clipboard.writeText(extractedEmails.join('\n'))
+        .then(() => alert("Emails copied to clipboard!"))
+        .catch(err => alert("Failed to copy: " + err));
+    }
+
+    function downloadCSV() {
+      if (extractedEmails.length === 0) {
+        alert("No emails to download. Extract emails first!");
+        return;
+      }
+
+      const csvContent = "data:text/csv;charset=utf-8," + extractedEmails.join("\n");
+      const encodedUri = encodeURI(csvContent);
+
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "emails.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
+</body>
+</html>
